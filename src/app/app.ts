@@ -1,12 +1,26 @@
-import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
+import {RouterOutlet} from '@angular/router';
+import {ErrorServiceService} from './services/error-service.service';
+import {Observable} from 'rxjs';
+import {AsyncPipe} from '@angular/common';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, AsyncPipe],
   templateUrl: './app.html',
-  styleUrl: './app.scss'
+  styleUrl: './app.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class App {
-  protected readonly title = signal('image-reader-example');
+  error$: Observable<string>;
+
+  #errorService = inject(ErrorServiceService);
+
+  constructor() {
+    this.error$ = this.#errorService.error$;
+  }
+
+  clearError(): void {
+    this.#errorService.clearError();
+  }
 }

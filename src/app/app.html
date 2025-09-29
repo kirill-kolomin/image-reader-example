@@ -1,1 +1,6 @@
+@if(error$ | async; as error) {
+  <p style="background: red">{{error}}</p>
+  <button type="button" (click)="clearError()">Skip</button>
+}
+
 <router-outlet></router-outlet>
