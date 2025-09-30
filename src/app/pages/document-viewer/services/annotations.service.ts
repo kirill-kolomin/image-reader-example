@@ -3,6 +3,7 @@ import {Annotation, PageImage} from '../../../domain/document.model';
 import {ApiFacadeService} from '../../../services/api-facade.service';
 import {takeUntilDestroyed, toObservable} from '@angular/core/rxjs-interop';
 import {filter, switchMap} from 'rxjs';
+import {DEFAULT_ZOOM_VALUE} from '../../../domain/default-zoom-value';
 
 @Injectable()
 export class AnnotationsService {
@@ -28,6 +29,7 @@ export class AnnotationsService {
   #startY = 0;
   #offsetX = 0;
   #offsetY = 0;
+  #zoom = DEFAULT_ZOOM_VALUE;
   #draggingAnnotation: Annotation | null = null;
 
   constructor() {
@@ -57,14 +59,15 @@ export class AnnotationsService {
     this.stopEditing();
   }
 
-  startDrawing(event: MouseEvent, page: PageImage) {
+  startDrawing(event: MouseEvent, page: PageImage): void {
     this.#drawing.set(true);
     this.#editing.set(true);
 
     const container = (event.target as HTMLElement).closest('.page-container') as HTMLElement;
     const bounds = container.getBoundingClientRect();
-    this.#startX = event.clientX - bounds.left;
-    this.#startY = event.clientY - bounds.top;
+
+    this.#startX = (event.clientX - bounds.left) / this.#zoom;
+    this.#startY = (event.clientY - bounds.top) / this.#zoom;
 
     const annotation = { pageId: page.id, top: this.#startY, left: this.#startX, width: 0, height: 0 };
     const annotations=  this.#annotations();
@@ -73,12 +76,12 @@ export class AnnotationsService {
     this.startEditing(annotation);
   }
 
-  onDrawing(event: MouseEvent) {
+  onDrawing(event: MouseEvent): void {
     if (this.#drawing()) {
       const container = (event.target as HTMLElement).closest('.page-container') as HTMLElement;
       const bounds = container.getBoundingClientRect();
-      const currentX = event.clientX - bounds.left;
-      const currentY = event.clientY - bounds.top;
+      const currentX = (event.clientX - bounds.left) / this.#zoom;
+      const currentY = (event.clientY - bounds.top) / this.#zoom;
 
       const annotations  = this.#annotations();
       const rect = annotations[annotations.length - 1];
@@ -91,28 +94,28 @@ export class AnnotationsService {
     if (this.#dragging() && this.#draggingAnnotation !== null) {
       const container = (event.target as HTMLElement).closest('.page-container') as HTMLElement;
       const bounds = container.getBoundingClientRect();
-      const currentX = event.clientX - bounds.left;
-      const currentY = event.clientY - bounds.top;
+      const currentX = (event.clientX - bounds.left) / this.#zoom;
+      const currentY = (event.clientY - bounds.top) / this.#zoom;
 
       let newLeft = currentX - this.#offsetX;
       let newTop = currentY - this.#offsetY;
 
       // Clamp so rectangle stays inside container
-      newLeft = Math.max(0, Math.min(newLeft, bounds.width - this.#draggingAnnotation.width));
-      newTop = Math.max(0, Math.min(newTop, bounds.height - this.#draggingAnnotation.height));
+      newLeft = Math.max(0, Math.min(newLeft, bounds.width / this.#zoom - this.#draggingAnnotation.width));
+      newTop = Math.max(0, Math.min(newTop, bounds.height / this.#zoom - this.#draggingAnnotation.height));
 
       this.#draggingAnnotation.left = newLeft;
       this.#draggingAnnotation.top = newTop;
     }
   }
 
-  endDrawing() {
+  endDrawing(): void {
     this.#drawing.set(false);
     this.#dragging.set(false);
     this.#draggingAnnotation = null;
   }
 
-  startDragging(event: MouseEvent, rect: Annotation) {
+  startDragging(event: MouseEvent, rect: Annotation): void {
     event.stopPropagation(); // prevent starting a new rect
 
     this.#dragging.set(true);
@@ -121,8 +124,8 @@ export class AnnotationsService {
     const container = (event.target as HTMLElement).closest('.page-container') as HTMLElement;
     const bounds = container.getBoundingClientRect();
 
-    const mouseX = event.clientX - bounds.left;
-    const mouseY = event.clientY - bounds.top;
+    const mouseX = (event.clientX - bounds.left) / this.#zoom;
+    const mouseY = (event.clientY - bounds.top) / this.#zoom;
 
     this.#offsetX = mouseX - rect.left;
     this.#offsetY = mouseY - rect.top;
@@ -133,7 +136,7 @@ export class AnnotationsService {
     this.#editingAnnotation.set(annotation);
   }
 
-  stopEditing() {
+  stopEditing(): void {
     this.#editing.set(false);
     this.#editingAnnotation.set(null);
   }
@@ -144,6 +147,10 @@ export class AnnotationsService {
     annotations.splice(index, 1);
 
     this.#annotations.set(annotations)
+  }
+
+  setZoom(zoom: number): void {
+    this.#zoom = zoom;
   }
 
   #trackDocumentAndGetAnnotations(): void {

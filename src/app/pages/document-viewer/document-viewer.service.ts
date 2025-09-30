@@ -1,4 +1,4 @@
-import {DestroyRef, inject, Injectable, Signal, signal} from '@angular/core';
+import {DestroyRef, effect, inject, Injectable, Signal, signal} from '@angular/core';
 import {combineLatest, filter, map, of, switchMap} from 'rxjs';
 import {ActivatedRoute} from '@angular/router';
 import {takeUntilDestroyed, toObservable} from '@angular/core/rxjs-interop';
@@ -6,6 +6,7 @@ import {Document, PageImage} from '../../domain/document.model';
 import {ApiFacadeService} from '../../services/api-facade.service';
 import {DOCUMENT_ID} from '../../domain/route-params';
 import {AnnotationsService} from "./services/annotations.service";
+import {ZoomService} from './services/zoom.service';
 
 @Injectable()
 export class DocumentViewerService {
@@ -15,6 +16,7 @@ export class DocumentViewerService {
   #route = inject(ActivatedRoute);
   #apiFacadeService = inject(ApiFacadeService);
   #annotationsService = inject(AnnotationsService);
+  #zoomService = inject(ZoomService);
   #destroyRef = inject(DestroyRef);
 
   #document = signal<Document | null>(null);
@@ -24,6 +26,8 @@ export class DocumentViewerService {
   constructor() {
     this.document = this.#document.asReadonly();
     this.pages = this.#pages.asReadonly();
+
+    this.#trackZoomAndSetToAnnotations();
   }
 
   run() {
@@ -67,5 +71,12 @@ export class DocumentViewerService {
       .subscribe((document) => {
         this.#annotationsService.setDocumentName(document.name);
       })
+  }
+
+  #trackZoomAndSetToAnnotations(): void {
+    effect(() => {
+      const zoomLevel = this.#zoomService.zoomLevel();
+      this.#annotationsService.setZoom(zoomLevel);
+    })
   }
 }
