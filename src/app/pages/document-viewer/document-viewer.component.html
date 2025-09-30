@@ -10,8 +10,8 @@
       <button (click)="saveDocument()" class="save-button">Save</button>
     </div>
 
-    @if(editing) {
-        <textarea class="text-area" #textEditor [value]="editingAnnotation?.text || ''"></textarea>
+    @if(editing()) {
+        <textarea class="text-area" #textEditor [value]="editingAnnotation()?.text || ''"></textarea>
     }
   </div>
 
@@ -31,7 +31,7 @@
 
             @for (rect of annotations() | annotationsForPage:page.id; track rect) {
               <div class="annotation"
-                   [ngClass]="drawing || dragging ? 'annotation--dragging' : ''"
+                   [ngClass]="drawing() || dragging() ? 'annotation--dragging' : ''"
                    [ngStyle]="{
                      top: rect.top + 'px',
                      left: rect.left + 'px',

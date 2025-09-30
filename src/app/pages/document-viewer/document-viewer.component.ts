@@ -26,8 +26,12 @@ import {ZoomService} from './services/zoom.service';
 export class DocumentViewerComponent implements OnInit {
   document: Signal<Document | null>;
   pages: Signal<PageImage[] | null>;
-  annotations = signal<Annotation[]>([]);
+  annotations: Signal<Annotation[]>;
   zoomLevel: Signal<number>;
+  editing: Signal<boolean>;
+  drawing: Signal<boolean>;
+  dragging: Signal<boolean>;
+  editingAnnotation: Signal<Annotation | null>;
 
   #documentViewerService =  inject(DocumentViewerService);
   #zoomService =  inject(ZoomService);
@@ -40,9 +44,15 @@ export class DocumentViewerComponent implements OnInit {
     this.document = this.#documentViewerService.document;
     this.pages = this.#documentViewerService.pages;
     this.zoomLevel = this.#zoomService.zoomLevel;
+    this.annotations = this.#annotationsService.annotations;
+    this.editing = this.#annotationsService.editing;
+    this.drawing = this.#annotationsService.drawing;
+    this.dragging = this.#annotationsService.dragging;
+    this.editingAnnotation = this.#annotationsService.editingAnnotation;
   }
 
   ngOnInit() {
+    this.#annotationsService.run();
     this.#documentViewerService.run();
   }
 
@@ -61,112 +71,36 @@ export class DocumentViewerComponent implements OnInit {
   #saveAnnotations(): void {
     const textEditor = this.textEditor();
 
-    if(!this.editingAnnotation) {
-      throw new Error('There must be annotation for editing.');
-    }
-
     if(!textEditor) {
       throw new Error('There must be text editor.');
     }
 
-    this.editingAnnotation.text =  textEditor.nativeElement.value;
-    this.stopEditing();
+    this.#annotationsService.saveAnnotations(textEditor.nativeElement.value);
   }
 
-  editing = false;
-  drawing = false;
-  dragging = false;
-  editingAnnotation: Annotation | null = null;
-  private startX = 0;
-  private startY = 0;
-  private offsetX = 0;
-  private offsetY = 0;
-  private draggingRect: Annotation | null = null;
-
   startDrawing(event: MouseEvent, page: PageImage) {
-    this.drawing = true;
-    this.editing = true;
-    const container = (event.target as HTMLElement).closest('.page-container') as HTMLElement;
-    const bounds = container.getBoundingClientRect();
-    this.startX = event.clientX - bounds.left;
-    this.startY = event.clientY - bounds.top;
-
-    const annotation = { pageId: page.id, top: this.startY, left: this.startX, width: 0, height: 0 };
-    this.annotations.set([...this.annotations(), annotation]);
-    this.startEditing(annotation);
+    this.#annotationsService.startDrawing(event, page);
   }
 
   onDrawing(event: MouseEvent) {
-    if (this.drawing) {
-      const container = (event.target as HTMLElement).closest('.page-container') as HTMLElement;
-      const bounds = container.getBoundingClientRect();
-      const currentX = event.clientX - bounds.left;
-      const currentY = event.clientY - bounds.top;
-
-      const rect = this.annotations()[this.annotations().length - 1];
-      rect.width = Math.abs(currentX - this.startX);
-      rect.height = Math.abs(currentY - this.startY);
-      rect.left = Math.min(this.startX, currentX);
-      rect.top = Math.min(this.startY, currentY);
-    }
-
-    if (this.dragging && this.draggingRect !== null) {
-      const container = (event.target as HTMLElement).closest('.page-container') as HTMLElement;
-      const bounds = container.getBoundingClientRect();
-      const currentX = event.clientX - bounds.left;
-      const currentY = event.clientY - bounds.top;
-
-      let newLeft = currentX - this.offsetX;
-      let newTop = currentY - this.offsetY;
-
-      // Clamp so rectangle stays inside container
-      newLeft = Math.max(0, Math.min(newLeft, bounds.width - this.draggingRect.width));
-      newTop = Math.max(0, Math.min(newTop, bounds.height - this.draggingRect.height));
-
-      this.draggingRect.left = newLeft;
-      this.draggingRect.top = newTop;
-    }
+    this.#annotationsService.onDrawing(event);
   }
 
   endDrawing() {
-    this.drawing = false;
-    this.dragging = false;
-    this.draggingRect = null;
+    this.#annotationsService.endDrawing();
   }
 
-  startDragging(event: MouseEvent, rect: Annotation) {
+  startDragging(event: MouseEvent, annotation: Annotation) {
     event.stopPropagation(); // prevent starting a new rect
-
-    this.dragging = true;
-    this.draggingRect = rect;
-
-    const container = (event.target as HTMLElement).closest('.page-container') as HTMLElement;
-    const bounds = container.getBoundingClientRect();
-
-    const mouseX = event.clientX - bounds.left;
-    const mouseY = event.clientY - bounds.top;
-
-    this.offsetX = mouseX - rect.left;
-    this.offsetY = mouseY - rect.top;
+    this.#annotationsService.startDragging(event, annotation);
   }
 
   startEditing(annotation: Annotation): void {
-    this.editing = true;
-    this.editingAnnotation = annotation;
+    this.#annotationsService.startEditing(annotation);
   }
 
-  stopEditing() {
-    this.editing = false;
-    this.editingAnnotation = null;
-  }
-
-  removeAnnotation(_annotation: Annotation, event: MouseEvent) {
+  removeAnnotation(annotation: Annotation, event: MouseEvent) {
     event.stopPropagation(); // prevent triggering drag/draw
-
-    const annotations = [...this.annotations()];
-    const index = annotations.findIndex(annotation => annotation === _annotation);
-    annotations.splice(index, 1);
-
-    this.annotations.set(annotations)
+    this.#annotationsService.removeAnnotation(annotation);
   }
 }

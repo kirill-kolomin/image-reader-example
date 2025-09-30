@@ -33,16 +33,6 @@ export class DocumentViewerService {
     this.#trackDocumentAndGetAnnotations();
   }
 
-  saveDocument(): Document | null {
-    const document = this.document();
-
-    if (document) {
-      return document;
-    }
-
-    return null;
-  }
-
   #getDocument(): void {
     this.#route.paramMap.pipe(
       map((params) => params.get(DOCUMENT_ID)),
