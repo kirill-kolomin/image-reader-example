@@ -51,8 +51,12 @@ export class DocumentViewerComponent implements OnInit {
   }
 
   drawing = false;
+  dragging = false;
   private startX = 0;
   private startY = 0;
+  private offsetX = 0;
+  private offsetY = 0;
+  private draggingRect: Annotation | null = null;
 
   startDrawing(event: MouseEvent, page: PageImage) {
     this.drawing = true;
@@ -65,21 +69,50 @@ export class DocumentViewerComponent implements OnInit {
   }
 
   onDrawing(event: MouseEvent) {
-    if (!this.drawing) return;
+    if (this.drawing) {
+      const container = (event.target as HTMLElement).closest('.page-container') as HTMLElement;
+      const bounds = container.getBoundingClientRect();
+      const currentX = event.clientX - bounds.left;
+      const currentY = event.clientY - bounds.top;
 
-    const container = (event.target as HTMLElement).closest('.page-container') as HTMLElement;
-    const bounds = container.getBoundingClientRect();
-    const currentX = event.clientX - bounds.left;
-    const currentY = event.clientY - bounds.top;
+      const rect = this.annotations()[this.annotations().length - 1];
+      rect.width = Math.abs(currentX - this.startX);
+      rect.height = Math.abs(currentY - this.startY);
+      rect.left = Math.min(this.startX, currentX);
+      rect.top = Math.min(this.startY, currentY);
+    }
 
-    const rect = this.annotations()[this.annotations().length - 1];
-    rect.width = Math.abs(currentX - this.startX);
-    rect.height = Math.abs(currentY - this.startY);
-    rect.left = Math.min(this.startX, currentX);
-    rect.top = Math.min(this.startY, currentY);
+    if (this.dragging && this.draggingRect !== null) {
+      const container = (event.target as HTMLElement).closest('.page-container') as HTMLElement;
+      const bounds = container.getBoundingClientRect();
+      const currentX = event.clientX - bounds.left;
+      const currentY = event.clientY - bounds.top;
+
+      const rect = this.draggingRect;
+      rect.left = currentX - this.offsetX;
+      rect.top = currentY - this.offsetY;
+    }
   }
 
   endDrawing() {
     this.drawing = false;
+    this.dragging = false;
+    this.draggingRect = null;
+  }
+
+  startDragging(event: MouseEvent, rect: Annotation) {
+    event.stopPropagation(); // prevent starting a new rect
+
+    this.dragging = true;
+    this.draggingRect = rect;
+
+    const container = (event.target as HTMLElement).closest('.page-container') as HTMLElement;
+    const bounds = container.getBoundingClientRect();
+
+    const mouseX = event.clientX - bounds.left;
+    const mouseY = event.clientY - bounds.top;
+
+    this.offsetX = mouseX - rect.left;
+    this.offsetY = mouseY - rect.top;
   }
 }
