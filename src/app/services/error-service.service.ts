@@ -6,7 +6,7 @@ import {toObservable} from '@angular/core/rxjs-interop';
 })
 export class ErrorServiceService {
   #error = signal('');
-  readonly error$ = toObservable(this.#error);
+  error$ = toObservable(this.#error);
 
   setError(error: string): void {
     this.#error.set(error);
