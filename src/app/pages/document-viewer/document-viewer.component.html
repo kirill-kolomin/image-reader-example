@@ -11,6 +11,12 @@
     </div>
   </div>
 
+  @if(editing) {
+    <div>
+      <textarea #textEditor [textContent]="editingAnnotation?.text || ''"></textarea>
+    </div>
+  }
+
   @if (pages()) {
     <div class="document-content"
          [style.zoom]="zoomLevel()">
@@ -25,15 +31,17 @@
 
             <img [src]="page.src"/>
 
-            @for (rect of annotations() | annotationsForPage:page.id; track rect; let idx = $index) {
-              <div class="annotation" [ngClass]="drawing || dragging ? 'annotation--dragging' : ''"
+            @for (rect of annotations() | annotationsForPage:page.id; track rect) {
+              <div class="annotation"
+                   [ngClass]="drawing || dragging ? 'annotation--dragging' : ''"
                    [ngStyle]="{
                      top: rect.top + 'px',
                      left: rect.left + 'px',
                      width: rect.width + 'px',
                      height: rect.height + 'px'
                    }"
-                   (mousedown)="startDragging($event, rect)">
+                   (mousedown)="startDragging($event, rect)"
+                   (click)="startEditing(rect)">
               </div>
             }
           </div>

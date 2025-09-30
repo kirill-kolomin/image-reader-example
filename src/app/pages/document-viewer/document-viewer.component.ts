@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, inject, OnInit, signal, Signal} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject, OnInit, signal, Signal, ViewChild} from '@angular/core';
 import {DocumentViewerService} from './document-viewer.service';
 import {Document, Annotation, Page, PageImage} from '../../models/document.model';
 import {AnnotationsForPagePipe} from '../../pipes/annotations-for-page.pipe';
@@ -24,6 +24,9 @@ export class DocumentViewerComponent implements OnInit {
   #zoomService =  inject(ZoomService);
   #annotationsService =  inject(AnnotationsService);
 
+  @ViewChild('textEditor', {static: false})
+  textEditor: HTMLTextAreaElement | null = null
+
   constructor(
   ) {
     this.document = this.#documentViewerService.document;
@@ -48,10 +51,22 @@ export class DocumentViewerComponent implements OnInit {
   }
 
   #saveAnnotations(): void {
+    if(!this.editingAnnotation) {
+      throw new Error('There must be annotation for editing.');
+    }
+
+    if(!this.textEditor) {
+      throw new Error('There must be text editor.');
+    }
+
+    this.editingAnnotation.text =  this.textEditor.textContent;
+    this.stopEditing();
   }
 
+  editing = false;
   drawing = false;
   dragging = false;
+  editingAnnotation: Annotation | null = null;
   private startX = 0;
   private startY = 0;
   private offsetX = 0;
@@ -60,12 +75,15 @@ export class DocumentViewerComponent implements OnInit {
 
   startDrawing(event: MouseEvent, page: PageImage) {
     this.drawing = true;
+    this.editing = true;
     const container = (event.target as HTMLElement).closest('.page-container') as HTMLElement;
     const bounds = container.getBoundingClientRect();
     this.startX = event.clientX - bounds.left;
     this.startY = event.clientY - bounds.top;
 
-    this.annotations.set([...this.annotations(),{ pageId: page.id, top: this.startY, left: this.startX, width: 0, height: 0 }]);
+    const annotation = { pageId: page.id, top: this.startY, left: this.startX, width: 0, height: 0 };
+    this.annotations.set([...this.annotations(), annotation]);
+    this.startEditing(annotation);
   }
 
   onDrawing(event: MouseEvent) {
@@ -114,5 +132,15 @@ export class DocumentViewerComponent implements OnInit {
 
     this.offsetX = mouseX - rect.left;
     this.offsetY = mouseY - rect.top;
+  }
+
+  startEditing(annotation: Annotation): void {
+    this.editing = true;
+    this.editingAnnotation = annotation;
+  }
+
+  stopEditing() {
+    this.editing = false;
+    this.editingAnnotation = null;
   }
 }
