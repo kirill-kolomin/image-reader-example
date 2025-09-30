@@ -22,7 +22,6 @@ export class DocumentViewerService {
   #pages = signal<PageImage[] | null>(null);
 
   constructor() {
-    // @ts-ignore
     this.document = this.#document.asReadonly();
     this.pages = this.#pages.asReadonly();
   }
@@ -40,7 +39,6 @@ export class DocumentViewerService {
       switchMap((id) => this.#apiFacadeService.getDocument(id)),
       takeUntilDestroyed(this.#destroyRef)
     ).subscribe((document) => {
-      // @ts-ignore
       this.#document.set(document);
     });
   }
