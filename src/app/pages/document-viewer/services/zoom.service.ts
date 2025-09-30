@@ -1,19 +1,26 @@
-import { Injectable } from '@angular/core';
-import {BehaviorSubject} from 'rxjs';
+import {Injectable, Signal, signal} from '@angular/core';
+
+const ZOOM_STEP = 0.1;
+const MAX_ZOOM_LEVEL = 2;
+const MIN_ZOOM_LEVEL = 0.5;
 
 @Injectable()
 export class ZoomService {
-  private zoomLevelSubject = new BehaviorSubject<number>(1);
+  zoomLevel: Signal<number>;
 
-  zoomLevel$ = this.zoomLevelSubject.asObservable();
+  #zoomLevel = signal(1);
+
+  constructor() {
+    this.zoomLevel = this.#zoomLevel.asReadonly();
+  }
 
   increaseZoom(): void {
-    const currentZoom = this.zoomLevelSubject.value;
-    this.zoomLevelSubject.next(Math.min(currentZoom + 0.1, 2)); // Max zoom: 2x
+    const currentZoom = this.#zoomLevel();
+    this.#zoomLevel.set(Math.min(currentZoom + ZOOM_STEP, MAX_ZOOM_LEVEL));
   }
 
   decreaseZoom(): void {
-    const currentZoom = this.zoomLevelSubject.value;
-    this.zoomLevelSubject.next(Math.max(currentZoom - 0.1, 0.5)); // Min zoom: 0.5x
+    const currentZoom = this.#zoomLevel();
+    this.#zoomLevel.set(Math.max(currentZoom - ZOOM_STEP, MIN_ZOOM_LEVEL));
   }
 }

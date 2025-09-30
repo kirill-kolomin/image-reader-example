@@ -12,12 +12,10 @@
   </div>
 
   @if (pages()) {
-    <div class="document-content">
-      @for(page of pages(); track page) {
-        <div
-          class="page-container"
-          [style.transform]="'scale(' + (zoomLevel$ | async) + ')'"
-        >
+    <div class="document-content"
+         [style.zoom]="(zoomLevel$ | async)">
+      @for (page of pages(); track page) {
+        <div class="page-container">
           <div class="page">
             <img
               [src]="page"
