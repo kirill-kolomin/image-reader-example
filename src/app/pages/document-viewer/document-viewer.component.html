@@ -1,6 +1,6 @@
 <div class="document-viewer-container">
   <div class="toolbar">
-    @if(document()) {
+    @if (document(); as document) {
       <h1>{{ document.name }}</h1>
     }
     <div class="controls">
