@@ -76,10 +76,22 @@
   position: relative;
   background-color: white;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  user-select: none;
 
   img {
     display: block;
     max-width: 100%;
     height: auto;
+  }
+}
+
+.annotation {
+  position: absolute;
+  border: 2px solid red;
+  background-color: rgba(255, 0, 0, 0.2);
+
+  &:hover:not(&--dragging) {
+    border: 2px solid #34a139;
+    background-color: rgba(255, 0, 0, 0.4);
   }
 }

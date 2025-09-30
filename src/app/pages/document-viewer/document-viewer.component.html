@@ -16,16 +16,29 @@
          [style.zoom]="zoomLevel()">
       @for (page of pages(); track page) {
         <div class="page-container">
-          <div class="page">
-            <img [src]="page"/>
+          <div class="page"
+               (mousedown)="startDrawing($event, page)"
+               (mousemove)="onDrawing($event)"
+               (mouseup)="endDrawing()">
+            <img [src]="page.src"/>
 
-<!--            @for(annotation of document.annotations | annotationsForPage:page.number; track annotation.id) {-->
-<!--              <app-annotation-->
-<!--                [annotation]="annotation"-->
-<!--                [zoomLevel]="zoomLevel$ | async"-->
-<!--              ></app-annotation>-->
-<!--            }-->
+            <!--            @for(annotation of document.annotations | annotationsForPage:page.number; track annotation.id) {-->
+            <!--              <app-annotation-->
+            <!--                [annotation]="annotation"-->
+            <!--                [zoomLevel]="zoomLevel$ | async"-->
+            <!--              ></app-annotation>-->
+            <!--            }-->
 
+            @for (rect of annotations() | annotationsForPage:page.id; track rect) {
+              <div class="annotation" [ngClass]="drawing ? 'annotation--dragging' : ''"
+                   [ngStyle]="{
+                     top: rect.top + 'px',
+                     left: rect.left + 'px',
+                     width: rect.width + 'px',
+                     height: rect.height + 'px'
+                   }">
+              </div>
+            }
           </div>
         </div>
       }

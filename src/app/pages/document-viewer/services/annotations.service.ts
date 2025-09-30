@@ -1,49 +1,80 @@
-import { Injectable } from '@angular/core';
-import {Annotation, Page} from '../../../models/document.model';
-import {BehaviorSubject} from 'rxjs';
+import {DestroyRef, inject, Injectable, Signal, signal} from '@angular/core';
+import {Annotation} from '../../../models/document.model';
+import {filter, switchMap} from 'rxjs';
+import {takeUntilDestroyed, toObservable} from '@angular/core/rxjs-interop';
+import {ApiFacadeService} from '../../../services/api-facade.service';
 
 @Injectable()
 export class AnnotationsService {
-  private annotationsSubject = new BehaviorSubject<Annotation[]>([]);
+  annotations: Signal<Annotation[] | null>;
+
+  #apiFacadeService = inject(ApiFacadeService);
+  #destroyRef = inject(DestroyRef);
+
+  #annotations = signal<Annotation[] | null>(null);
+  #documentName = signal<string | null>(null);
+
+  #documentName$ = toObservable(this.#documentName);
+
+  constructor() {
+    this.annotations = this.#annotations.asReadonly();
+  }
+
+  setDocumentName(documentName: string): void {
+    this.#documentName.set(documentName);
+  }
 
   addAnnotation(annotation: Omit<Annotation, 'id'>): void {
-    const currentAnnotations = this.annotationsSubject.value;
+    const currentAnnotations = this.#annotations();
+
+    if(!currentAnnotations) {
+      return;
+    }
+
     const newAnnotation: Annotation = {
       ...annotation,
       id: crypto.randomUUID(),
     };
 
     const updatedAnnotations = [...currentAnnotations, newAnnotation];
-    this.annotationsSubject.next(updatedAnnotations);
-
-    this.#updateDocumentWithAnnotations(updatedAnnotations);
+    this.#annotations.set(updatedAnnotations);
   }
 
   updateAnnotation(annotation: Annotation): void {
-    const currentAnnotations = this.annotationsSubject.value;
+    const currentAnnotations = this.#annotations();
+
+    if(!currentAnnotations) {
+      return;
+    }
+
     const updatedAnnotations = currentAnnotations.map(a =>
       a.id === annotation.id ? annotation : a
     );
 
-    this.annotationsSubject.next(updatedAnnotations);
-    this.#updateDocumentWithAnnotations(updatedAnnotations);
+    this.#annotations.set(updatedAnnotations);
   }
 
   deleteAnnotation(id: string): void {
-    const currentAnnotations = this.annotationsSubject.value;
+    const currentAnnotations = this.#annotations();
+
+    if(!currentAnnotations) {
+      return;
+    }
+
     const updatedAnnotations = currentAnnotations.filter(a => a.id !== id);
 
-    this.annotationsSubject.next(updatedAnnotations);
-    this.#updateDocumentWithAnnotations(updatedAnnotations);
+    this.#annotations.set(updatedAnnotations);
   }
 
-  #updateDocumentWithAnnotations(annotations: Annotation[]): void {
-    // const currentDocument = this.documentSubject.value;
-    // if (currentDocument) {
-    //   this.documentSubject.next({
-    //     ...currentDocument,
-    //     annotations
-    //   });
-    // }
+  #trackDocumentAndGetAnnotations(): void {
+    this.#documentName$
+      .pipe(
+        filter(Boolean),
+        switchMap((documentName) => this.#apiFacadeService.getDocumentAnnotations(documentName)),
+        takeUntilDestroyed(this.#destroyRef)
+      )
+      .subscribe((annotations) => {
+        this.#annotations.set(annotations);
+      })
   }
 }
