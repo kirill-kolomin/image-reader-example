@@ -1,4 +1,13 @@
-import {ChangeDetectionStrategy, Component, inject, OnInit, signal, Signal, ViewChild} from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  inject,
+  OnInit,
+  signal,
+  Signal,
+  viewChild,
+} from '@angular/core';
 import {DocumentViewerService} from './document-viewer.service';
 import {Document, Annotation, Page, PageImage} from '../../models/document.model';
 import {AnnotationsForPagePipe} from '../../pipes/annotations-for-page.pipe';
@@ -24,8 +33,7 @@ export class DocumentViewerComponent implements OnInit {
   #zoomService =  inject(ZoomService);
   #annotationsService =  inject(AnnotationsService);
 
-  @ViewChild('textEditor', {static: false})
-  textEditor: HTMLTextAreaElement | null = null
+  textEditor  = viewChild<ElementRef<HTMLTextAreaElement>>('textEditor');
 
   constructor(
   ) {
@@ -51,15 +59,17 @@ export class DocumentViewerComponent implements OnInit {
   }
 
   #saveAnnotations(): void {
+    const textEditor = this.textEditor();
+
     if(!this.editingAnnotation) {
       throw new Error('There must be annotation for editing.');
     }
 
-    if(!this.textEditor) {
+    if(!textEditor) {
       throw new Error('There must be text editor.');
     }
 
-    this.editingAnnotation.text =  this.textEditor.textContent;
+    this.editingAnnotation.text =  textEditor.nativeElement.value;
     this.stopEditing();
   }
 

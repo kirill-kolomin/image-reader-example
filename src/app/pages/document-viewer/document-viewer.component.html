@@ -13,7 +13,7 @@
 
   @if(editing) {
     <div>
-      <textarea #textEditor [textContent]="editingAnnotation?.text || ''"></textarea>
+      <textarea class="text-area" #textEditor [value]="editingAnnotation?.text || ''"></textarea>
     </div>
   }
 
@@ -42,6 +42,7 @@
                    }"
                    (mousedown)="startDragging($event, rect)"
                    (click)="startEditing(rect)">
+                {{rect.text}}
               </div>
             }
           </div>
