@@ -2,9 +2,9 @@ import {DestroyRef, inject, Injectable, Signal, signal} from '@angular/core';
 import {combineLatest, filter, map, of, switchMap} from 'rxjs';
 import {ActivatedRoute} from '@angular/router';
 import {takeUntilDestroyed, toObservable} from '@angular/core/rxjs-interop';
-import {Document, PageImage} from '../../models/document.model';
+import {Document, PageImage} from '../../domain/document.model';
 import {ApiFacadeService} from '../../services/api-facade.service';
-import {DOCUMENT_ID} from '../../models/route-params';
+import {DOCUMENT_ID} from '../../domain/route-params';
 import {AnnotationsService} from "./services/annotations.service";
 
 @Injectable()

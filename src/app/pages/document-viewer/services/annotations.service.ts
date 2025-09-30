@@ -1,5 +1,5 @@
 import {DestroyRef, inject, Injectable, Signal, signal} from '@angular/core';
-import {Annotation, PageImage} from '../../../models/document.model';
+import {Annotation, PageImage} from '../../../domain/document.model';
 import {ApiFacadeService} from '../../../services/api-facade.service';
 import {takeUntilDestroyed, toObservable} from '@angular/core/rxjs-interop';
 import {filter, switchMap} from 'rxjs';

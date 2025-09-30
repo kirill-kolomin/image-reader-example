@@ -1,7 +1,7 @@
 import {inject, Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {catchError, Observable, of, switchMap, throwError} from 'rxjs';
-import {Annotation, Document} from '../models/document.model';
+import {Annotation, Document} from '../domain/document.model';
 import mock from '../../mocks/1.json';
 
 @Injectable({

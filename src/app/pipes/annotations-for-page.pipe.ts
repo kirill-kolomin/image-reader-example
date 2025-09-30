@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { Annotation } from '../models/document.model';
+import { Annotation } from '../domain/document.model';
 
 @Pipe({
   name: 'annotationsForPage',

@@ -9,7 +9,7 @@ import {
   viewChild,
 } from '@angular/core';
 import {DocumentViewerService} from './document-viewer.service';
-import {Document, Annotation, Page, PageImage} from '../../models/document.model';
+import {Document, Annotation, Page, PageImage} from '../../domain/document.model';
 import {AnnotationsForPagePipe} from '../../pipes/annotations-for-page.pipe';
 import {NgClass, NgStyle, PercentPipe} from '@angular/common';
 import {AnnotationsService} from './services/annotations.service';
