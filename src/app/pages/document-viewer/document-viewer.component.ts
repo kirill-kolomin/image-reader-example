@@ -1,7 +1,6 @@
 import {ChangeDetectionStrategy, Component, inject, OnInit, Signal} from '@angular/core';
-import {DocumentViewerService} from './services/document-viewer.service';
-import {Observable} from 'rxjs';
-import {DocumentWithAnnotations, Page} from '../../models/document.model';
+import {DocumentViewerService} from './document-viewer.service';
+import {Document, Annotation} from '../../models/document.model';
 import {AnnotationComponent} from '../../components/annotation/annotation.component';
 import {AnnotationsForPagePipe} from '../../pipes/annotations-for-page.pipe';
 import {AsyncPipe, PercentPipe} from '@angular/common';
@@ -17,7 +16,7 @@ import {ZoomService} from './services/zoom.service';
   providers: [DocumentViewerService, AnnotationsService, ZoomService],
 })
 export class DocumentViewerComponent implements OnInit {
-  document: Signal<DocumentWithAnnotations | null>;
+  document: Signal<Document | null>;
   pages: Signal<string[] | null>;
   zoomLevel: Signal<number>;
 

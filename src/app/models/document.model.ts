@@ -16,7 +16,3 @@ export interface Annotation {
   x: number;
   y: number;
 }
-
-export interface DocumentWithAnnotations extends Document {
-  annotations: Annotation[];
-}
