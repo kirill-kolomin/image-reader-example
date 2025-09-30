@@ -1,0 +1,38 @@
+<div class="document-viewer-container">
+  <div class="toolbar">
+    @if(document()) {
+      <h1>{{ document.name }}</h1>
+    }
+    <div class="controls">
+      <button (click)="decreaseZoom()" class="zoom-button">-</button>
+      <span class="zoom-level">{{ (zoomLevel$ | async) | percent }}</span>
+      <button (click)="increaseZoom()" class="zoom-button">+</button>
+      <button (click)="saveDocument()" class="save-button">Save</button>
+    </div>
+  </div>
+
+  @if (pages()) {
+    <div class="document-content">
+      @for(page of pages(); track page) {
+        <div
+          class="page-container"
+          [style.transform]="'scale(' + (zoomLevel$ | async) + ')'"
+        >
+          <div class="page">
+            <img
+              [src]="page"
+            />
+
+<!--            @for(annotation of document.annotations | annotationsForPage:page.number; track annotation.id) {-->
+<!--              <app-annotation-->
+<!--                [annotation]="annotation"-->
+<!--                [zoomLevel]="zoomLevel$ | async"-->
+<!--              ></app-annotation>-->
+<!--            }-->
+
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
