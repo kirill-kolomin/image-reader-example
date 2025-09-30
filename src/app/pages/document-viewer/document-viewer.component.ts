@@ -1,7 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  ElementRef,
+  ElementRef, HostListener,
   inject,
   OnInit,
   signal,
@@ -56,10 +56,13 @@ export class DocumentViewerComponent implements OnInit {
     this.#documentViewerService.run();
   }
 
+  @HostListener('window:keydown.+')
+  @HostListener('window:keydown.=')
   increaseZoom(): void {
     this.#zoomService.increaseZoom();
   }
 
+  @HostListener('window:keydown.-')
   decreaseZoom(): void {
     this.#zoomService.decreaseZoom();
   }
