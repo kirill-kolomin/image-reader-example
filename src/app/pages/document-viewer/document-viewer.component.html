@@ -1,7 +1,7 @@
 <div class="document-viewer-container">
   <div class="toolbar">
     @if (document(); as document) {
-      <h1>{{ document.name }}</h1>
+      <h1 class="title">{{ document.name }}</h1>
     }
     <div class="controls">
       <button (click)="decreaseZoom()" class="zoom-button">-</button>
@@ -27,7 +27,7 @@
 
             <div class="page-overlay"></div>
 
-            <img [src]="page.src"/>
+            <img class="image" [src]="page.src"/>
 
             @for (rect of annotations() | annotationsForPage:page.id; track rect) {
               <div class="annotation"
