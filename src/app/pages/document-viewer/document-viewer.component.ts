@@ -159,4 +159,14 @@ export class DocumentViewerComponent implements OnInit {
     this.editing = false;
     this.editingAnnotation = null;
   }
+
+  removeAnnotation(_annotation: Annotation, event: MouseEvent) {
+    event.stopPropagation(); // prevent triggering drag/draw
+
+    const annotations = [...this.annotations()];
+    const index = annotations.findIndex(annotation => annotation === _annotation);
+    annotations.splice(index, 1);
+
+    this.annotations.set(annotations)
+  }
 }

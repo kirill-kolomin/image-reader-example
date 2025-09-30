@@ -43,6 +43,11 @@
                    (mousedown)="startDragging($event, rect)"
                    (click)="startEditing(rect)">
                 {{rect.text}}
+
+                <button class="delete-btn"
+                        (click)="removeAnnotation(rect, $event)">
+                  ✕
+                </button>
               </div>
             }
           </div>
