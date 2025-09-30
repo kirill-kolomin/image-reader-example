@@ -5,7 +5,7 @@
     }
     <div class="controls">
       <button (click)="decreaseZoom()" class="zoom-button">-</button>
-      <span class="zoom-level">{{ (zoomLevel$ | async) | percent }}</span>
+      <span class="zoom-level">{{ zoomLevel() | percent }}</span>
       <button (click)="increaseZoom()" class="zoom-button">+</button>
       <button (click)="saveDocument()" class="save-button">Save</button>
     </div>
@@ -13,7 +13,7 @@
 
   @if (pages()) {
     <div class="document-content"
-         [style.zoom]="(zoomLevel$ | async)">
+         [style.zoom]="zoomLevel()">
       @for (page of pages(); track page) {
         <div class="page-container">
           <div class="page">

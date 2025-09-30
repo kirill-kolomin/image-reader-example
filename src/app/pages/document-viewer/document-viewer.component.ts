@@ -4,13 +4,13 @@ import {Observable} from 'rxjs';
 import {DocumentWithAnnotations, Page} from '../../models/document.model';
 import {AnnotationComponent} from '../../components/annotation/annotation.component';
 import {AnnotationsForPagePipe} from '../../pipes/annotations-for-page.pipe';
-import {AsyncPipe, JsonPipe, PercentPipe} from '@angular/common';
+import {AsyncPipe, PercentPipe} from '@angular/common';
 import {AnnotationsService} from './services/annotations.service';
 import {ZoomService} from './services/zoom.service';
 
 @Component({
   selector: 'app-document-viewer',
-  imports: [AnnotationComponent, AnnotationsForPagePipe, AsyncPipe, PercentPipe, JsonPipe],
+  imports: [AnnotationComponent, AnnotationsForPagePipe, AsyncPipe, PercentPipe],
   templateUrl: './document-viewer.component.html',
   styleUrls: ['./document-viewer.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -19,8 +19,7 @@ import {ZoomService} from './services/zoom.service';
 export class DocumentViewerComponent implements OnInit {
   document: Signal<DocumentWithAnnotations | null>;
   pages: Signal<string[] | null>;
-
-  zoomLevel$: Observable<number>;
+  zoomLevel: Signal<number>;
 
   #documentViewerService =  inject(DocumentViewerService);
   #zoomService =  inject(ZoomService);
@@ -30,7 +29,7 @@ export class DocumentViewerComponent implements OnInit {
   ) {
     this.document = this.#documentViewerService.document;
     this.pages = this.#documentViewerService.pages;
-    this.zoomLevel$ = this.#zoomService.zoomLevel$;
+    this.zoomLevel = this.#zoomService.zoomLevel;
   }
 
   ngOnInit() {
