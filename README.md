@@ -1,59 +1,26 @@
-# ImageReaderExample
+Тестовое задание выполнено согласно описанию.
+На задание было потрачено около 8 часов времени.
+Дорабатывать задание можно сколько угодно, но основная идея отображена в написанном коде.
+Остальные моменты подсвечены ниже.
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.2.
+По достоинствам и недостаткам предложенного решения.
+Основной принцип, которому я следовал во время выполнения задания - скорость.
+Поэтому какие-то места могут быть плохо спроектированы и неконсистентны.
+Все возможные архитектурные решения рассмотрены не были, опять же в угоду скорого завершения работы над основными требованиями.
 
-## Development server
+Возможные ошибки:
+1. При небольшой по ширине экране зум работает некорректно на увеличении.
 
-To start a local development server, run:
+Дополнительно:
+1. Был добавлен обработчик непойманных глобальных ошибок. И отображена панель в случае ошибки.
+2. Добавлена страница для ненайденного ресурса - 404.
 
-```bash
-ng serve
-```
-
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Что ещё можно было бы сделать (обязательно для продуктового окружения):
+1. Разработка через TDD. Тестирование всего функционала. Смотри https://kirill-kolomin.github.io/ngx-testbox-docs/
+2. Добавить состояние загрузки.
+3. Анимация переходов между состояниями.
+4. Подключить и использовать UI-kit.
+5. Сделать более точечную работу с исключениями.
+6. Следовать стандарту RFC-7807 для работы над ошибками.
+7. Сохранять аннотации для документа на сервере или другом сторедже.
+8. Добавить декораторы по обработке ошибок с сервера и показа всплывающих тостов. Задекорировать методы из API фасад сервиса.
