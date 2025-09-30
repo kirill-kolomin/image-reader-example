@@ -20,6 +20,9 @@
                (mousedown)="startDrawing($event, page)"
                (mousemove)="onDrawing($event)"
                (mouseup)="endDrawing()">
+
+            <div class="page-overlay"></div>
+
             <img [src]="page.src"/>
 
             @for (rect of annotations() | annotationsForPage:page.id; track rect; let idx = $index) {
