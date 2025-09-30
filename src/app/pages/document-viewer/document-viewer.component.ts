@@ -106,9 +106,15 @@ export class DocumentViewerComponent implements OnInit {
       const currentX = event.clientX - bounds.left;
       const currentY = event.clientY - bounds.top;
 
-      const rect = this.draggingRect;
-      rect.left = currentX - this.offsetX;
-      rect.top = currentY - this.offsetY;
+      let newLeft = currentX - this.offsetX;
+      let newTop = currentY - this.offsetY;
+
+      // Clamp so rectangle stays inside container
+      newLeft = Math.max(0, Math.min(newLeft, bounds.width - this.draggingRect.width));
+      newTop = Math.max(0, Math.min(newTop, bounds.height - this.draggingRect.height));
+
+      this.draggingRect.left = newLeft;
+      this.draggingRect.top = newTop;
     }
   }
 
