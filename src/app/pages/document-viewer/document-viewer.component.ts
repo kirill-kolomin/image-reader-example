@@ -69,6 +69,7 @@ export class DocumentViewerComponent implements OnInit {
 
   saveDocument(): void {
     this.#saveAnnotations();
+    console.table(this.annotations())
   }
 
   #saveAnnotations(): void {
