@@ -9,13 +9,11 @@
       <button (click)="increaseZoom()" class="zoom-button">+</button>
       <button (click)="saveDocument()" class="save-button">Save</button>
     </div>
-  </div>
 
-  @if(editing) {
-    <div>
-      <textarea class="text-area" #textEditor [value]="editingAnnotation?.text || ''"></textarea>
-    </div>
-  }
+    @if(editing) {
+        <textarea class="text-area" #textEditor [value]="editingAnnotation?.text || ''"></textarea>
+    }
+  </div>
 
   @if (pages()) {
     <div class="document-content"

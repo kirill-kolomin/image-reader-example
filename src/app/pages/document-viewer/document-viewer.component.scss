@@ -6,6 +6,7 @@
   position: sticky;
   top: 0;
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
   padding: 1rem;
@@ -93,6 +94,7 @@
 }
 
 .text-area {
+  margin-top: 12px;
   width: 100%;
 }
 
